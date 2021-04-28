@@ -1,10 +1,8 @@
-package com.example.crypytocoins
+package com.example.crypytocoins.services
 
 import android.content.Context
-import android.graphics.Bitmap
 import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.Volley
 
 class VolleySingleton constructor(context: Context) {
