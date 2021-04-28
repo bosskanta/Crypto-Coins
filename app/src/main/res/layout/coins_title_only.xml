@@ -11,25 +11,24 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/imageview_coin_2"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:contentDescription="@string/crypto_coin_image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/crypto_coin_image"
-            tools:srcCompat="@tools:sample/avatars" />
+            tools:srcCompat="@android:drawable/sym_def_app_icon" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textview_coin_title_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:text="@string/sample_title"
-            android:textColor="@color/black"
             android:textSize="@dimen/title_font_size"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageView2"
+            app:layout_constraintEnd_toStartOf="@+id/imageview_coin_2"
             app:layout_constraintTop_toTopOf="parent" />
 
 
