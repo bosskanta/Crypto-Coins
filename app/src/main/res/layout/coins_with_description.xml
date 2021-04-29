@@ -4,16 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp">
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingVertical="8dp">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageview_coin"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:padding="@dimen/icon_padding"
             android:contentDescription="@string/crypto_coin_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -24,10 +28,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:text="@string/sample_title"
+            android:textColor="@color/black"
             android:textSize="@dimen/title_font_size"
             android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/textview_coin_descr"
             app:layout_constraintStart_toEndOf="@+id/imageview_coin"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,14 +41,23 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginEnd="36dp"
+            android:ellipsize="end"
             android:maxLines="3"
             android:text="@string/sample_description"
+            android:textColor="@color/gray"
             android:textSize="@dimen/description_font_size"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageview_coin"
             app:layout_constraintTop_toBottomOf="@+id/textview_coin_title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/cardview_shadow_start_color"
+        android:layout_gravity="bottom" />
 
 </androidx.cardview.widget.CardView>

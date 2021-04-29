@@ -4,14 +4,21 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
+import coil.ImageLoader
+import coil.decode.SvgDecoder
+import coil.request.LoadRequest
 import com.example.crypytocoins.R
 import com.example.crypytocoins.models.Coin
 import com.example.crypytocoins.models.ViewType
+import com.squareup.picasso.Picasso
 
-class RecyclerViewAdapter(context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+class RecyclerViewAdapter(private val context: Context, private val activity: AppCompatActivity) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val list = mutableListOf<Coin>()
 
@@ -48,25 +55,66 @@ class RecyclerViewAdapter(context: Context) : RecyclerView.Adapter<RecyclerView.
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is DescriptionViewHolder -> holder.apply {
-                title.text = list[position].name
-                descr.text = list[position].description
+                titleTextView.text = list[position].name
+                descrTextView.text = list[position].description
+                setIcon(iconImageView, position)
             }
             is TitleOnlyViewHolder -> holder.apply {
-                title.text = list[position].name
+                titleTextView.text = list[position].name
+                setIcon(iconImageView, position)
             }
         }
+
     }
 
     override fun getItemCount(): Int = list.size
 
+    fun setIcon(iconImageView: AppCompatImageView, position: Int) {
+        val iconSize = context.resources.getDimension(R.dimen.icon_size).toInt()
+
+        // Pre-process URL string
+        list[position].iconUrl = list[position].iconUrl.replace("?size=48x48", "")
+        if (list[position].iconUrl.contains(".svg")) {
+            list[position].iconType = "vector"
+        }
+
+        if (list[position].iconType == "vector") {
+            // svg image loader
+            iconImageView.loadSvg(list[position].iconUrl)
+        } else {
+            // png, jpg image loader
+            Picasso.get()
+                .load(list[position].iconUrl)
+                .resize(iconSize, iconSize)
+                .centerCrop()
+                .into(iconImageView)
+        }
+    }
+
     inner class DescriptionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val image = view.findViewById<ImageView>(R.id.imageview_coin)
-        val title: TextView = view.findViewById<TextView>(R.id.textview_coin_title)
-        val descr: TextView = view.findViewById<TextView>(R.id.textview_coin_descr)
+        val iconImageView: AppCompatImageView = view.findViewById(R.id.imageview_coin)
+        val titleTextView: TextView = view.findViewById(R.id.textview_coin_title)
+        val descrTextView: TextView = view.findViewById(R.id.textview_coin_descr)
     }
 
     inner class TitleOnlyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val image = view.findViewById<ImageView>(R.id.imageview_coin_2)
-        val title: TextView = view.findViewById<TextView>(R.id.textview_coin_title_2)
+        val iconImageView: AppCompatImageView = view.findViewById(R.id.imageview_coin_2)
+        val titleTextView: TextView = view.findViewById(R.id.textview_coin_title_2)
+    }
+}
+
+// Extension function, for AppCompatImageView
+fun AppCompatImageView.loadSvg(myUrl: String?) {
+    myUrl?.let {
+        val imageLoader = ImageLoader.Builder(this.context)
+            .componentRegistry {
+                add(SvgDecoder(this@loadSvg.context))
+            }
+            .build()
+        val request = LoadRequest.Builder(this.context)
+            .data(it)
+            .target(this)
+            .build()
+        imageLoader.execute(request)
     }
 }

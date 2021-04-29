@@ -3,6 +3,8 @@ package com.example.crypytocoins
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Html
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.ContentLoadingProgressBar
@@ -41,7 +43,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun fetchCoinsData() {
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView.adapter = null
         coinList.clear()
 
         // Create circular progressbar to show when fetching data
@@ -50,7 +51,8 @@ class MainActivity : AppCompatActivity() {
 
         val url = "https://api.coinranking.com/v1/public/coins"
         val requestString = StringRequest(
-            Request.Method.GET, url,
+            Request.Method.GET,
+            url,
             { response ->
                 val responseString = response.toString()
 
@@ -69,10 +71,14 @@ class MainActivity : AppCompatActivity() {
                     val slug = coinObject.getString("slug")
                     val symbol = coinObject.getString("symbol")
                     val name = coinObject.getString("name")
-                    var description = coinObject.getString("description").replace("<p>", "")
-                    if (description.isEmpty() || description == "null") {
-                        description = "No description provided."
+                    var description = coinObject.getString("description")
+
+                    description = if (description.isEmpty() || description == "null") {
+                        "No description provided."
+                    } else {
+                        Html.fromHtml(description, Html.FROM_HTML_MODE_COMPACT).toString()
                     }
+
                     val iconType = coinObject.getString("iconType")
                     val iconUrl = coinObject.getString("iconUrl")
 
@@ -89,15 +95,18 @@ class MainActivity : AppCompatActivity() {
                         iconUrl
                     )
                     coinList.add(coin)
+
+                    Log.e("Test", "${rank-1}: $name, $iconType")
                 }
 
                 // Set coin list to RecyclerViewAdapter
-                val recyclerViewAdapter = RecyclerViewAdapter(applicationContext)
+                val recyclerViewAdapter = RecyclerViewAdapter(applicationContext, this)
                 recyclerViewAdapter.setList(coinList)
 
                 // Set adapter to RecyclerView
                 recyclerView.apply {
-                    layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                    layoutManager =
+                        LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                     isNestedScrollingEnabled = false
                     adapter = recyclerViewAdapter
                     onFlingListener = null
@@ -105,7 +114,11 @@ class MainActivity : AppCompatActivity() {
 
                 // Added all coins, hide progress bar
                 progressBar.hide()
-            }, { Toast.makeText(applicationContext, "Error! cannot get data", Toast.LENGTH_LONG).show() })
+            },
+            {
+                Toast.makeText(applicationContext, "Error! cannot get data", Toast.LENGTH_LONG)
+                    .show()
+            })
 
         // Add request to Volley queue
         VolleySingleton.getInstance(this).addToRequestQueue(requestString)

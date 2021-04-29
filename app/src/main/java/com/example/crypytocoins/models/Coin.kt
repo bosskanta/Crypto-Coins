@@ -9,6 +9,6 @@ data class Coin(
     val symbol: String,
     val name: String,
     val description: String,
-    val iconType: String,
-    val iconUrl: String
+    var iconType: String,
+    var iconUrl: String
 )
