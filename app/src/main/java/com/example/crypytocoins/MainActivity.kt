@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Html
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.ContentLoadingProgressBar
@@ -13,9 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
-import com.example.crypytocoins.adapters.RecyclerViewAdapter
 import com.example.crypytocoins.models.Coin
 import com.example.crypytocoins.models.ViewType
+import com.example.crypytocoins.recycler_view.RecyclerViewAdapter
 import com.example.crypytocoins.services.VolleySingleton
 import org.json.JSONObject
 
@@ -23,32 +22,56 @@ class MainActivity : AppCompatActivity() {
     // Create a list with type "Coin" to keep coins data
     private val coinList = mutableListOf<Coin>()
 
+    lateinit var recyclerView: RecyclerView
+    lateinit var linearLayoutManager: LinearLayoutManager
+    lateinit var recyclerViewAdapter: RecyclerViewAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Initialize requestQueue
-        VolleySingleton.getInstance(this.applicationContext).requestQueue
+        VolleySingleton.getInstance(this).requestQueue
+
+        recyclerView = findViewById(R.id.recycler_view)
+        recyclerViewAdapter = RecyclerViewAdapter(this, this)
+        linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
         fetchCoinsData()
 
-        // Set on-refresh behavior
-        val swipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayout)
+        // Set scrolling behavior
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    if (recyclerViewAdapter.itemCount != coinList.size) {
+                        Toast.makeText(applicationContext, "Loading...", Toast.LENGTH_SHORT).show()
+                        recyclerViewAdapter.getMoreItems(coinList)
+                    }
+                }
+            }
+        })
+
+        // Set pull to refresh behavior
+        val swipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout)
         swipeRefreshLayout.setOnRefreshListener {
             fetchCoinsData()
             Handler(Looper.getMainLooper()).postDelayed({
                 swipeRefreshLayout.isRefreshing = false
-            }, 500)
+            }, 300)
         }
     }
 
+    // Fetch first 10 items
     private fun fetchCoinsData() {
-        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
         coinList.clear()
 
-        // Create circular progressbar to show when fetching data
-        val progressBar = findViewById<ContentLoadingProgressBar>(R.id.progress_circular)
-        progressBar.show()
+        // Show circle progress loading
+        val progress: ContentLoadingProgressBar = findViewById(R.id.progress_circular)
+        progress.show()
 
+        // Network operation, get all coins data to coinList
         val url = "https://api.coinranking.com/v1/public/coins"
         val requestString = StringRequest(
             Request.Method.GET,
@@ -95,25 +118,20 @@ class MainActivity : AppCompatActivity() {
                         iconUrl
                     )
                     coinList.add(coin)
-
-                    Log.e("Test", "${rank-1}: $name, $iconType")
                 }
 
-                // Set coin list to RecyclerViewAdapter
-                val recyclerViewAdapter = RecyclerViewAdapter(applicationContext, this)
+                // Set first 10 coins to adapter
                 recyclerViewAdapter.setList(coinList)
 
                 // Set adapter to RecyclerView
                 recyclerView.apply {
-                    layoutManager =
-                        LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                    layoutManager = linearLayoutManager
                     isNestedScrollingEnabled = false
                     adapter = recyclerViewAdapter
                     onFlingListener = null
                 }
 
-                // Added all coins, hide progress bar
-                progressBar.hide()
+                progress.hide()
             },
             {
                 Toast.makeText(applicationContext, "Error! cannot get data", Toast.LENGTH_LONG)
