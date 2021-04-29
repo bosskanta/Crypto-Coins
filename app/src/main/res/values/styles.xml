@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppSearchView" parent="Widget.AppCompat.SearchView" >
+        <!-- Show Query Hint When Idle -->
+        <item name="hintTextColor">@color/search_icon_color</item>
+        <item name="android:queryHint">@string/query_hint</item>
+        <!-- Text Size -->
+        <item name="android:textSize">@dimen/title_font_size</item>
+        <!-- Query Text Color -->
+        <item name="android:textColorPrimary">@color/black</item>
+        <!-- Hint Color -->
+        <item name="android:textColorHint">@color/search_icon_color</item>
+        <!-- Icon Color -->
+        <item name="android:tint">@color/search_icon_color</item>
+    </style>
+</resources>

@@ -3,4 +3,5 @@
     <string name="crypto_coin_image">Crypto coin image</string>
     <string name="sample_title">Sample Title</string>
     <string name="sample_description">Sample Description</string>
+    <string name="query_hint">ค้นหา</string>
 </resources>

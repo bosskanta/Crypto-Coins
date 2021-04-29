@@ -57,7 +57,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/cardview_shadow_start_color"
+        android:background="@color/search_box_color"
         android:layout_gravity="bottom" />
 
 </androidx.cardview.widget.CardView>
