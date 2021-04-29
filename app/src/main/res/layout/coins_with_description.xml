@@ -17,8 +17,8 @@
             android:id="@+id/imageview_coin"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
-            android:padding="@dimen/icon_padding"
             android:contentDescription="@string/crypto_coin_image"
+            android:padding="@dimen/icon_padding"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@android:drawable/sym_def_app_icon" />
@@ -57,7 +57,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/search_box_color"
-        android:layout_gravity="bottom" />
+        android:layout_gravity="bottom"
+        android:background="@color/search_box_color" />
 
 </androidx.cardview.widget.CardView>

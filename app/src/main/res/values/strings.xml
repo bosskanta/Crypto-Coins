@@ -4,4 +4,5 @@
     <string name="sample_title">Sample Title</string>
     <string name="sample_description">Sample Description</string>
     <string name="query_hint">ค้นหา</string>
+    <string name="pull_to_refresh">Pull to refresh</string>
 </resources>

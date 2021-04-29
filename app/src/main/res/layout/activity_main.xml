@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@color/white"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -17,10 +18,10 @@
 
         <SearchView
             android:id="@+id/search_view"
-            android:iconifiedByDefault="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_rounded"
+            android:iconifiedByDefault="false"
             android:theme="@style/AppSearchView" />
 
     </RelativeLayout>
@@ -50,10 +51,9 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false">
-
-        </androidx.recyclerview.widget.RecyclerView>
+            android:clipToPadding="false"></androidx.recyclerview.widget.RecyclerView>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 
 </RelativeLayout>

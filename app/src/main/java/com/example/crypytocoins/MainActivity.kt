@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Html
-import android.view.View
-import android.view.Window
-import android.view.WindowInsetsController
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.ContentLoadingProgressBar
@@ -15,19 +13,22 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
+import com.example.crypytocoins.adapters.RecyclerViewAdapter
 import com.example.crypytocoins.models.Coin
 import com.example.crypytocoins.models.ViewType
-import com.example.crypytocoins.recycler_view.RecyclerViewAdapter
 import com.example.crypytocoins.services.VolleySingleton
 import org.json.JSONObject
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     // Create a list with type "Coin" to keep coins data
     private val coinList = mutableListOf<Coin>()
+    private var canScroll = true
 
     lateinit var recyclerView: RecyclerView
     lateinit var linearLayoutManager: LinearLayoutManager
     lateinit var recyclerViewAdapter: RecyclerViewAdapter
+    lateinit var searchView: SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         VolleySingleton.getInstance(this).requestQueue
 
         recyclerView = findViewById(R.id.recycler_view)
-        recyclerViewAdapter = RecyclerViewAdapter(this, this)
+        recyclerViewAdapter = RecyclerViewAdapter(this)
         linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
         fetchCoinsData()
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
 
-                if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                if (canScroll && !recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
                     if (recyclerViewAdapter.itemCount != coinList.size) {
                         Toast.makeText(applicationContext, "Loading...", Toast.LENGTH_SHORT).show()
                         recyclerViewAdapter.getMoreItems(coinList)
@@ -59,13 +60,46 @@ class MainActivity : AppCompatActivity() {
         })
 
         // Set pull to refresh behavior
-        val swipeRefreshLayout = findViewById<SwipeRefreshLayout>(R.id.swipe_refresh_layout)
+        val swipeRefreshLayout: SwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout)
         swipeRefreshLayout.setOnRefreshListener {
+            searchView.setQuery("", false)
+            searchView.clearFocus()
+            canScroll = true
             fetchCoinsData()
             Handler(Looper.getMainLooper()).postDelayed({
                 swipeRefreshLayout.isRefreshing = false
             }, 300)
         }
+
+        searchView = findViewById(R.id.search_view)
+
+        // Set searching behavior
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return search(query)
+            }
+
+            override fun onQueryTextChange(query: String): Boolean {
+                return search(query)
+            }
+
+            fun search(query: String?): Boolean {
+                canScroll = false
+
+                if (query != null && query != "") {
+                    val foundCoins = coinList.filter {
+                        it.name.toLowerCase(Locale.ROOT).startsWith(query) ||
+                                it.symbol.toLowerCase(Locale.ROOT).startsWith(query) ||
+                                it.slug.toLowerCase(Locale.ROOT).startsWith(query) ||
+                                it.id.toString() == query
+                    }
+                    recyclerViewAdapter.setList(foundCoins as MutableList<Coin>)
+                }
+                return true
+            }
+
+        })
     }
 
     // Fetch first 10 items
@@ -126,7 +160,8 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // Set first 10 coins to adapter
-                recyclerViewAdapter.setList(coinList)
+                recyclerViewAdapter.clearList()
+                recyclerViewAdapter.getMoreItems(coinList)
 
                 // Set adapter to RecyclerView
                 recyclerView.apply {

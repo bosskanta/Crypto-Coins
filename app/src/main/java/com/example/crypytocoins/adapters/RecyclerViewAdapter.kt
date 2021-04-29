@@ -1,16 +1,11 @@
-package com.example.crypytocoins.recycler_view
+package com.example.crypytocoins.adapters
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.widget.ContentLoadingProgressBar
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import coil.decode.SvgDecoder
@@ -21,7 +16,7 @@ import com.example.crypytocoins.models.ViewType
 import com.squareup.picasso.Picasso
 
 
-class RecyclerViewAdapter(private val context: Context, private val activity: AppCompatActivity) :
+class RecyclerViewAdapter(private val context: Context) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val list = mutableListOf<Coin>()
@@ -29,10 +24,15 @@ class RecyclerViewAdapter(private val context: Context, private val activity: Ap
     // Items limit
     private val limit = 10
 
-    // Set first 10 items
+    // Set list to passed list
     fun setList(coinList: MutableList<Coin>) {
+        clearList()
+        list.addAll(coinList)
+        notifyDataSetChanged()
+    }
+
+    fun clearList() {
         list.clear()
-        getMoreItems(coinList)
     }
 
     // Get more 10 items to show
